@@ -307,9 +307,15 @@ export class TrpcRouter {
 
   constructor(
     private readonly trpc: TrpcService,
+    private readonly practicasService: PracticasService,
+    private readonly tesisService: TesisService,
+    private readonly reportsService: ReportsService,
   ) {
     this.appRouter = buildAppRouter(
       this.trpc,
+      this.practicasService,
+      this.tesisService,
+      this.reportsService,
     );
   }
 

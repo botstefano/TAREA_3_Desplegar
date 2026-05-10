@@ -1,15 +1,26 @@
 import { httpBatchLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
 
+const getBaseUrl = () => {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+
+  if (typeof window !== 'undefined') {
+    return '';
+  }
+
+  return 'http://localhost:4000';
+};
+
 export const api = createTRPCReact<any>();
 
-export function getTrpcClient() {
-  return api.createClient({
+export const getTrpcClient = () =>
+  api.createClient({
     links: [
       httpBatchLink({
-        url: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/trpc',
+        url: `${getBaseUrl()}/trpc`,
       }),
     ],
   });
-}
 

@@ -78,14 +78,19 @@ export class ReportsService {
   }
 
   private async renderHtmlToPdf(html: string): Promise<string> {
+    const executablePath =
+      process.env.CHROMIUM_PATH ??
+      process.env.PUPPETEER_EXECUTABLE_PATH ??
+      '/usr/bin/chromium-browser';
+
     const browser = await puppeteer.launch({
       headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      executablePath: '/usr/bin/chromium',
+      executablePath,
     });
     const page = await browser.newPage();
-    await page.setContent(html);
-    const pdfBuffer = await page.pdf({ format: 'A4' });
+    await page.setContent(html, { waitUntil: 'networkidle0' });
+    const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
     await browser.close();
     return pdfBuffer.toString('base64');
   }

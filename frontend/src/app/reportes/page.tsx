@@ -5,11 +5,11 @@ import { api } from '@/utils/trpc';
 import { saveAs } from 'file-saver';
 
 export default function ReportesPage() {
-  const globalStats = api.reportsModule.globalStats.useQuery();
-  const estudiantes = api.practicasModule.listEstudiantes.useQuery();
+  const globalStats = api.reports.globalStats.useQuery();
+  const estudiantes = api.practicas.listEstudiantes.useQuery();
 
   const [estudianteId, setEstudianteId] = useState('');
-  const summary = api.reportsModule.studentSummary.useQuery(
+  const summary = api.reports.studentSummary.useQuery(
     { estudiante_id: estudianteId },
     { enabled: !!estudianteId },
   );
@@ -21,35 +21,29 @@ export default function ReportesPage() {
 
   const handleDownloadOperational = async () => {
     try {
-      const pdf = await api.reportes.operationalReportPdf.query();
+      const pdf = await api.reports.operationalReportPdf.query();
       saveAs(createPdfBlob(pdf), 'reporte_operacional.pdf');
     } catch (error) {
       console.error('Error descargando reporte operacional:', error);
-      alert('Error al generar el reporte operacional. Por favor intente nuevamente.');
     }
   };
 
   const handleDownloadManagement = async () => {
     try {
-      const pdf = await api.reportes.managementReportPdf.query();
+      const pdf = await api.reports.managementReportPdf.query();
       saveAs(createPdfBlob(pdf), 'reporte_gestion.pdf');
     } catch (error) {
       console.error('Error descargando reporte de gestión:', error);
-      alert('Error al generar el reporte de gestión. Por favor intente nuevamente.');
     }
   };
 
   const handleDownloadStudent = async () => {
-    if (!estudianteId) {
-      alert('Por favor seleccione un estudiante primero.');
-      return;
-    }
+    if (!estudianteId) return;
     try {
-      const pdf = await api.reportes.studentReportPdf.query({ estudiante_id: estudianteId });
+      const pdf = await api.reports.studentReportPdf.query({ estudiante_id: estudianteId });
       saveAs(createPdfBlob(pdf), 'reporte_estudiante.pdf');
     } catch (error) {
       console.error('Error descargando reporte de estudiante:', error);
-      alert('Error al generar el reporte del estudiante. Por favor intente nuevamente.');
     }
   };
 
