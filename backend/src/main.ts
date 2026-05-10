@@ -10,6 +10,8 @@ async function bootstrap() {
   trpcRouter.applyMiddleware(app);
 
   const port = process.env.PORT || 4000;
+  console.log(`Starting application on port ${port}`);
   await app.listen(port);
+  console.log(`Application started successfully on port ${port}`);
 }
 bootstrap();
