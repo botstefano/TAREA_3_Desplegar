@@ -1,13 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { api } from '@/utils/trpc';
 
 export default function EmpresasPage() {
-  const empresas = api.empresas.list.useQuery();
-  const createEmpresa = api.empresas.create.useMutation({
-    onSuccess: () => api.empresas.list.invalidate(),
-  });
+  const [empresas, setEmpresas] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     ruc: '',
@@ -16,8 +15,58 @@ export default function EmpresasPage() {
     correo_contacto: '',
   });
 
-  const errMsg = (e: unknown) =>
-    e && typeof e === 'object' && 'message' in e ? String((e as { message: string }).message) : 'Error';
+  const handleSubmit = async (ev: React.FormEvent) => {
+    ev.preventDefault();
+    setIsCreating(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/empresas/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ruc: form.ruc.trim(),
+          razon_social: form.razon_social.trim(),
+          direccion: form.direccion.trim() || null,
+          correo_contacto: form.correo_contacto.trim() || null,
+          tiene_convenio: true,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al crear empresa');
+      }
+
+      setForm({ ruc: '', razon_social: '', direccion: '', correo_contacto: '' });
+      // Recargar lista
+      loadEmpresas();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const loadEmpresas = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/empresas/list`);
+      if (response.ok) {
+        const data = await response.json();
+        setEmpresas(data);
+      }
+    } catch (err) {
+      console.error('Error cargando empresas:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    loadEmpresas();
+  }, []);
 
   return (
     <div className="p-8 space-y-10 max-w-6xl">
@@ -28,22 +77,7 @@ export default function EmpresasPage() {
 
       <section className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-4">
         <h2 className="text-lg font-semibold text-gray-800">Registrar empresa</h2>
-        <form
-          className="grid gap-4 md:grid-cols-3"
-          onSubmit={(ev) => {
-            ev.preventDefault();
-            createEmpresa.mutate(
-              {
-                ruc: form.ruc.trim(),
-                razon_social: form.razon_social.trim(),
-                direccion: form.direccion.trim() || null,
-                correo_contacto: form.correo_contacto.trim() || null,
-                tiene_convenio: true,
-              },
-              { onSuccess: () => setForm({ ruc: '', razon_social: '', direccion: '', correo_contacto: '' }) },
-            );
-          }}
-        >
+        <form className="grid gap-4 md:grid-cols-3" onSubmit={handleSubmit}>
           <input
             className="border rounded-lg px-3 py-2"
             placeholder="RUC (11 dígitos)"
@@ -73,13 +107,13 @@ export default function EmpresasPage() {
           />
           <button
             type="submit"
-            disabled={createEmpresa.isLoading}
+            disabled={isCreating}
             className="bg-unt-blue text-white px-4 py-2 rounded-lg hover:bg-blue-900 disabled:opacity-50 w-fit md:col-span-3"
           >
-            Guardar
+            {isCreating ? 'Guardando...' : 'Guardar'}
           </button>
         </form>
-        {createEmpresa.isError && <p className="text-sm text-red-600">{errMsg(createEmpresa.error)}</p>}
+        {error && <p className="text-sm text-red-600">{error}</p>}
       </section>
 
       <section className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-4">
@@ -94,7 +128,7 @@ export default function EmpresasPage() {
               </tr>
             </thead>
             <tbody>
-              {(empresas.data ?? []).map(
+              {empresas.map(
                 (e: { id: string; razon_social: string; ruc: string; tiene_convenio: boolean | null }) => (
                   <tr key={e.id} className="border-b border-gray-50">
                     <td className="py-2 pr-4">{e.razon_social}</td>
@@ -105,7 +139,7 @@ export default function EmpresasPage() {
               )}
             </tbody>
           </table>
-          {empresas.isLoading && <p className="text-gray-500 text-sm mt-2">Cargando…</p>}
+          {isLoading && <p className="text-gray-500 text-sm mt-2">Cargando…</p>}
         </div>
       </section>
     </div>
