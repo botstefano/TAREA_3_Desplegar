@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * La app usa fondo claro. No forzar texto blanco en prefers-color-scheme: dark
+ * (rompe inputs/selects que heredan color del body sobre fondo blanco).
+ */
+:root {
+  --foreground-rgb: 17, 24, 39; /* gray-900 */
+  --background-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 17, 24, 39;
+    --background-rgb: 255, 255, 255;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+}
+
+@layer base {
+  input,
+  textarea,
+  select {
+    @apply text-gray-900 bg-white;
+  }
+}

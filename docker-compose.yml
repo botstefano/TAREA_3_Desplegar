@@ -1,0 +1,42 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: unt_db
+    environment:
+      POSTGRES_USER: user_unt
+      POSTGRES_PASSWORD: password_unt
+      POSTGRES_DB: unt_gestion
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: unt_backend
+    ports:
+      - "4000:4000"
+    environment:
+      DATABASE_URL: postgresql://user_unt:password_unt@db:5432/unt_gestion
+      JWT_SECRET: secret_unt_2024
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: unt_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:4000/trpc
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
