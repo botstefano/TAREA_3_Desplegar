@@ -12,26 +12,26 @@ const ESTADOS_PRACTICA = [
 ] as const;
 
 export default function PracticasPage() {
-  const utils = api.useUtils();
+  const utils = api.useContext();
 
-  const empresas = api.practicasModule.listEmpresas.useQuery();
-  const estudiantes = api.practicasModule.listEstudiantes.useQuery();
-  const ofertas = api.practicasModule.listOfertas.useQuery();
-  const practicas = api.practicasModule.list.useQuery();
+  const empresas = api.empresas.list.useQuery();
+  const estudiantes = api.estudiantes.list.useQuery();
+  const ofertas = api.ofertas.list.useQuery();
+  const practicas = api.practicas.list.useQuery();
 
-  const createEmpresa = api.practicas.createEmpresa.useMutation({
+  const createEmpresa = api.empresas.create.useMutation({
     onSuccess: () => {
-      void utils.practicas.listEmpresas.invalidate();
+      void utils.empresas.list.invalidate();
     },
   });
-  const createOferta = api.practicas.createOferta.useMutation({
+  const createOferta = api.ofertas.create.useMutation({
     onSuccess: () => {
-      void utils.practicas.listOfertas.invalidate();
+      void utils.ofertas.list.invalidate();
     },
   });
-  const deleteOferta = api.practicas.deleteOferta.useMutation({
+  const deleteOferta = api.ofertas.delete.useMutation({
     onSuccess: () => {
-      void utils.practicas.listOfertas.invalidate();
+      void utils.ofertas.list.invalidate();
     },
   });
   const createPractica = api.practicas.create.useMutation({
