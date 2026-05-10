@@ -4,10 +4,9 @@ import React, { useState } from 'react';
 import { api } from '@/utils/trpc';
 
 export default function EmpresasPage() {
-  const utils = api.useUtils();
-  const empresas = api.practicasModule.listEmpresas.useQuery();
-  const createEmpresa = api.practicasModule.createEmpresa.useMutation({
-    onSuccess: () => void utils.practicasModule.listEmpresas.invalidate(),
+  const empresas = api.empresas.list.useQuery();
+  const createEmpresa = api.empresas.create.useMutation({
+    onSuccess: () => api.empresas.list.invalidate(),
   });
 
   const [form, setForm] = useState({
