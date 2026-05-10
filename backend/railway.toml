@@ -7,10 +7,3 @@ healthcheckPath = "/trpc"
 healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
-
-# Variables de entorno para producción
-[variables]
-NODE_ENV = "production"
-PORT = "4000"
-DATABASE_URL = "${{DATABASE_URL}}"
-JWT_SECRET = "${{JWT_SECRET}}"
