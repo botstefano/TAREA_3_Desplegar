@@ -24,9 +24,9 @@ const estadoTesis = z.enum([
 
 export function buildAppRouter(
   trpc: TrpcService,
-  practicasService: PracticasService,
-  tesisService: TesisService,
-  reportsService: ReportsService,
+  practicasService?: any,
+  tesisService?: any,
+  reportsService?: any,
 ) {
   return trpc.router({
     hello: trpc.procedure
@@ -307,15 +307,9 @@ export class TrpcRouter {
 
   constructor(
     private readonly trpc: TrpcService,
-    private readonly practicasService: PracticasService,
-    private readonly tesisService: TesisService,
-    private readonly reportsService: ReportsService,
   ) {
     this.appRouter = buildAppRouter(
       this.trpc,
-      this.practicasService,
-      this.tesisService,
-      this.reportsService,
     );
   }
 

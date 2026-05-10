@@ -1,13 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TrpcService } from './trpc/trpc.service';
 import { TrpcRouter } from './trpc/trpc.router';
-import { PracticasModule } from './practicas/practicas.module';
-import { DatabaseModule } from './database/database.module';
-import { TesisModule } from './tesis/tesis.module';
-import { ReportsModule } from './reports/reports.module';
 
+// Versión mínima temporal para Railway
 @Module({
-  imports: [DatabaseModule, PracticasModule, TesisModule, ReportsModule],
+  imports: [],
   controllers: [],
   providers: [TrpcService, TrpcRouter],
 })
