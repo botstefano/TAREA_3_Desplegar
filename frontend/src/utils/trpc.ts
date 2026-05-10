@@ -13,7 +13,7 @@ const getBaseUrl = () => {
   return 'http://localhost:4000';
 };
 
-export const api = createTRPCReact<any>();
+export const api = createTRPCReact<any>() as any;
 
 export const getTrpcClient = () =>
   api.createClient({

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { api } from '@/utils/trpc';
 
 const ESTADOS_PRACTICA = [
@@ -12,7 +13,7 @@ const ESTADOS_PRACTICA = [
 ] as const;
 
 export default function PracticasPage() {
-  const utils = api.useContext();
+  const queryClient = useQueryClient();
 
   const empresas = api.empresas.list.useQuery();
   const estudiantes = api.estudiantes.list.useQuery();
@@ -21,35 +22,35 @@ export default function PracticasPage() {
 
   const createEmpresa = api.empresas.create.useMutation({
     onSuccess: () => {
-      void utils.empresas.list.invalidate();
+      void queryClient.invalidateQueries(api.empresas.list.getQueryKey());
     },
   });
   const createOferta = api.ofertas.create.useMutation({
     onSuccess: () => {
-      void utils.ofertas.list.invalidate();
+      void queryClient.invalidateQueries(api.ofertas.list.getQueryKey());
     },
   });
   const deleteOferta = api.ofertas.delete.useMutation({
     onSuccess: () => {
-      void utils.ofertas.list.invalidate();
+      void queryClient.invalidateQueries(api.ofertas.list.getQueryKey());
     },
   });
   const createPractica = api.practicas.create.useMutation({
     onSuccess: () => {
-      void utils.practicas.list.invalidate();
-      void utils.practicas.metrics.invalidate();
+      void queryClient.invalidateQueries(api.practicas.list.getQueryKey());
+      void queryClient.invalidateQueries(api.practicas.metrics.getQueryKey());
     },
   });
   const updateEstado = api.practicas.updateEstado.useMutation({
     onSuccess: () => {
-      void utils.practicas.list.invalidate();
-      void utils.practicas.metrics.invalidate();
+      void queryClient.invalidateQueries(api.practicas.list.getQueryKey());
+      void queryClient.invalidateQueries(api.practicas.metrics.getQueryKey());
     },
   });
   const deletePractica = api.practicas.delete.useMutation({
     onSuccess: () => {
-      void utils.practicas.list.invalidate();
-      void utils.practicas.metrics.invalidate();
+      void queryClient.invalidateQueries(api.practicas.list.getQueryKey());
+      void queryClient.invalidateQueries(api.practicas.metrics.getQueryKey());
     },
   });
 

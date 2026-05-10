@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { api } from '@/utils/trpc';
 
 const ESTADOS_TESIS = [
@@ -12,7 +13,7 @@ const ESTADOS_TESIS = [
 ] as const;
 
 export default function TesisPage() {
-  const utils = api.useContext();
+  const queryClient = useQueryClient();
 
   const list = api.tesis.list.useQuery();
   const estudiantes = api.practicas.listEstudiantes.useQuery();
@@ -30,28 +31,44 @@ export default function TesisPage() {
   );
 
   const create = api.tesis.create.useMutation({
-    onSuccess: () => void utils.tesis.list.invalidate(),
+    onSuccess: () => void queryClient.invalidateQueries(api.tesis.list.getQueryKey()),
   });
   const updateEstado = api.tesis.updateEstado.useMutation({
-    onSuccess: () => void utils.tesis.list.invalidate(),
+    onSuccess: () => void queryClient.invalidateQueries(api.tesis.list.getQueryKey()),
   });
   const deleteTesis = api.tesis.delete.useMutation({
     onSuccess: () => {
-      void utils.tesis.list.invalidate();
+      void queryClient.invalidateQueries(api.tesis.list.getQueryKey());
       setSelectedId(null);
     },
   });
   const createAvance = api.tesis.createAvance.useMutation({
-    onSuccess: () => void utils.tesis.avancesByTesis.invalidate(),
+    onSuccess: () => {
+      if (selectedId) {
+        void queryClient.invalidateQueries(api.tesis.avancesByTesis.getQueryKey({ tesis_id: selectedId }));
+      }
+    },
   });
   const deleteAvance = api.tesis.deleteAvance.useMutation({
-    onSuccess: () => void utils.tesis.avancesByTesis.invalidate(),
+    onSuccess: () => {
+      if (selectedId) {
+        void queryClient.invalidateQueries(api.tesis.avancesByTesis.getQueryKey({ tesis_id: selectedId }));
+      }
+    },
   });
   const addJurado = api.tesis.addJurado.useMutation({
-    onSuccess: () => void utils.tesis.juradosByTesis.invalidate(),
+    onSuccess: () => {
+      if (selectedId) {
+        void queryClient.invalidateQueries(api.tesis.juradosByTesis.getQueryKey({ tesis_id: selectedId }));
+      }
+    },
   });
   const removeJurado = api.tesis.removeJurado.useMutation({
-    onSuccess: () => void utils.tesis.juradosByTesis.invalidate(),
+    onSuccess: () => {
+      if (selectedId) {
+        void queryClient.invalidateQueries(api.tesis.juradosByTesis.getQueryKey({ tesis_id: selectedId }));
+      }
+    },
   });
 
   const [form, setForm] = useState({
